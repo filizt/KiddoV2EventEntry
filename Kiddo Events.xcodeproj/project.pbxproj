@@ -1,0 +1,384 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0AD8CE643C0A1C4BB200C454 /* Pods_Kiddo_Events.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA3358893A8BDADAC8D93D7D /* Pods_Kiddo_Events.framework */; };
+		BDB8CEB51E7731C900D44D31 /* AlertViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDB8CEB41E7731C900D44D31 /* AlertViewController.swift */; };
+		BDCAAE891E67D33300AF21D7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDCAAE881E67D33300AF21D7 /* AppDelegate.swift */; };
+		BDCAAE8B1E67D33300AF21D7 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDCAAE8A1E67D33300AF21D7 /* ViewController.swift */; };
+		BDCAAE901E67D33300AF21D7 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BDCAAE8E1E67D33300AF21D7 /* Main.storyboard */; };
+		BDCAAEA01E6F4FC100AF21D7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BDCAAE9F1E6F4FC100AF21D7 /* Assets.xcassets */; };
+		BDDCC1AF1E8D951800A14671 /* DateUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDDCC1AE1E8D951700A14671 /* DateUtil.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		688F2E266F9A9DAA022B811A /* Pods-Kiddo Events.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Kiddo Events.release.xcconfig"; path = "Pods/Target Support Files/Pods-Kiddo Events/Pods-Kiddo Events.release.xcconfig"; sourceTree = "<group>"; };
+		941DD674720E910CC7701E81 /* Pods-Kiddo Events.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Kiddo Events.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Kiddo Events/Pods-Kiddo Events.debug.xcconfig"; sourceTree = "<group>"; };
+		BDB8CEB41E7731C900D44D31 /* AlertViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlertViewController.swift; sourceTree = "<group>"; };
+		BDCAAE851E67D33300AF21D7 /* Kiddo Events.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Kiddo Events.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		BDCAAE881E67D33300AF21D7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		BDCAAE8A1E67D33300AF21D7 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		BDCAAE8F1E67D33300AF21D7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		BDCAAE911E67D33300AF21D7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		BDCAAE9F1E6F4FC100AF21D7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		BDDCC1AE1E8D951700A14671 /* DateUtil.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DateUtil.swift; sourceTree = "<group>"; };
+		EA3358893A8BDADAC8D93D7D /* Pods_Kiddo_Events.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Kiddo_Events.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		BDCAAE821E67D33300AF21D7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0AD8CE643C0A1C4BB200C454 /* Pods_Kiddo_Events.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		80BCDED9B782283C14E891A9 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				941DD674720E910CC7701E81 /* Pods-Kiddo Events.debug.xcconfig */,
+				688F2E266F9A9DAA022B811A /* Pods-Kiddo Events.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		BDCAAE7C1E67D33300AF21D7 = {
+			isa = PBXGroup;
+			children = (
+				BDCAAE871E67D33300AF21D7 /* Kiddo Events */,
+				BDCAAE861E67D33300AF21D7 /* Products */,
+				80BCDED9B782283C14E891A9 /* Pods */,
+				F15745F3F969A86022B97396 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		BDCAAE861E67D33300AF21D7 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				BDCAAE851E67D33300AF21D7 /* Kiddo Events.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		BDCAAE871E67D33300AF21D7 /* Kiddo Events */ = {
+			isa = PBXGroup;
+			children = (
+				BDCAAE9F1E6F4FC100AF21D7 /* Assets.xcassets */,
+				BDCAAE881E67D33300AF21D7 /* AppDelegate.swift */,
+				BDCAAE8A1E67D33300AF21D7 /* ViewController.swift */,
+				BDCAAE8E1E67D33300AF21D7 /* Main.storyboard */,
+				BDCAAE911E67D33300AF21D7 /* Info.plist */,
+				BDB8CEB41E7731C900D44D31 /* AlertViewController.swift */,
+				BDDCC1AE1E8D951700A14671 /* DateUtil.swift */,
+			);
+			path = "Kiddo Events";
+			sourceTree = "<group>";
+		};
+		F15745F3F969A86022B97396 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				EA3358893A8BDADAC8D93D7D /* Pods_Kiddo_Events.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		BDCAAE841E67D33300AF21D7 /* Kiddo Events */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BDCAAE941E67D33300AF21D7 /* Build configuration list for PBXNativeTarget "Kiddo Events" */;
+			buildPhases = (
+				B2D3CBB83837AE556712483A /* [CP] Check Pods Manifest.lock */,
+				BDCAAE811E67D33300AF21D7 /* Sources */,
+				BDCAAE821E67D33300AF21D7 /* Frameworks */,
+				BDCAAE831E67D33300AF21D7 /* Resources */,
+				4299018841085FB542F9D4C6 /* [CP] Embed Pods Frameworks */,
+				65FE019B461F0D7F6841C5D1 /* [CP] Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Kiddo Events";
+			productName = "Kiddo Events";
+			productReference = BDCAAE851E67D33300AF21D7 /* Kiddo Events.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		BDCAAE7D1E67D33300AF21D7 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 0820;
+				LastUpgradeCheck = 0820;
+				ORGANIZATIONNAME = "Filiz Kurban";
+				TargetAttributes = {
+					BDCAAE841E67D33300AF21D7 = {
+						CreatedOnToolsVersion = 8.2.1;
+						DevelopmentTeam = AWF997WQMM;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = BDCAAE801E67D33300AF21D7 /* Build configuration list for PBXProject "Kiddo Events" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = BDCAAE7C1E67D33300AF21D7;
+			productRefGroup = BDCAAE861E67D33300AF21D7 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				BDCAAE841E67D33300AF21D7 /* Kiddo Events */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		BDCAAE831E67D33300AF21D7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BDCAAE901E67D33300AF21D7 /* Main.storyboard in Resources */,
+				BDCAAEA01E6F4FC100AF21D7 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		4299018841085FB542F9D4C6 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Kiddo Events/Pods-Kiddo Events-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		65FE019B461F0D7F6841C5D1 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Kiddo Events/Pods-Kiddo Events-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		B2D3CBB83837AE556712483A /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		BDCAAE811E67D33300AF21D7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BDCAAE8B1E67D33300AF21D7 /* ViewController.swift in Sources */,
+				BDDCC1AF1E8D951800A14671 /* DateUtil.swift in Sources */,
+				BDB8CEB51E7731C900D44D31 /* AlertViewController.swift in Sources */,
+				BDCAAE891E67D33300AF21D7 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		BDCAAE8E1E67D33300AF21D7 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				BDCAAE8F1E67D33300AF21D7 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		BDCAAE921E67D33300AF21D7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		BDCAAE931E67D33300AF21D7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+			};
+			name = Release;
+		};
+		BDCAAE951E67D33300AF21D7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 941DD674720E910CC7701E81 /* Pods-Kiddo Events.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = AWF997WQMM;
+				INFOPLIST_FILE = "Kiddo Events/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "filizk.Kiddo-Events";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
+			};
+			name = Debug;
+		};
+		BDCAAE961E67D33300AF21D7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 688F2E266F9A9DAA022B811A /* Pods-Kiddo Events.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = AWF997WQMM;
+				INFOPLIST_FILE = "Kiddo Events/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "filizk.Kiddo-Events";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		BDCAAE801E67D33300AF21D7 /* Build configuration list for PBXProject "Kiddo Events" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BDCAAE921E67D33300AF21D7 /* Debug */,
+				BDCAAE931E67D33300AF21D7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BDCAAE941E67D33300AF21D7 /* Build configuration list for PBXNativeTarget "Kiddo Events" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BDCAAE951E67D33300AF21D7 /* Debug */,
+				BDCAAE961E67D33300AF21D7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = BDCAAE7D1E67D33300AF21D7 /* Project object */;
+}
