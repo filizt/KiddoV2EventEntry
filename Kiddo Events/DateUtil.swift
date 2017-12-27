@@ -28,7 +28,8 @@ class DateUtil {
     }
 
     func createUTCDate(from date: Date) -> Date? {
-        var dateComponents = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: date)
+        var dateComponents = Calendar.current.dateComponents([.year, .month, .day, .hour], from: date)
+        dateComponents.hour = 08
         dateComponents.timeZone = TimeZone(abbreviation: "UTC")
 
         return Calendar.current.date(from:dateComponents)
