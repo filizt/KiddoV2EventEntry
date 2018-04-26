@@ -23,11 +23,13 @@ class ViewController: NSViewController, NSTableViewDelegate, NSTableViewDataSour
     @IBOutlet weak var dateListTable: NSTableView!
     @IBOutlet weak var doneButton: NSButton!
 
+    @IBOutlet weak var ticketsURL: NSTextField!
+    @IBOutlet weak var discountedTicketsURL: NSTextField!
+    @IBOutlet weak var discountedSessionsTable: NSTableView!
     @IBOutlet weak var eventImageObjectId: NSTextField!
     @IBOutlet weak var popularEventCheckButton: NSButton!
     @IBOutlet weak var eventActiveCheckButton: NSButton!
     @IBOutlet weak var freeEventCheckButton: NSButton!
-    @IBOutlet weak var allDayCheckButton: NSButton!
     @IBOutlet weak var eventDescription: NSTextField!
     @IBOutlet weak var categoryList: NSPopUpButton!
     @IBOutlet weak var eventAges: NSTextField!
@@ -52,14 +54,11 @@ class ViewController: NSViewController, NSTableViewDelegate, NSTableViewDataSour
     }
 
     var geoLocation = PFGeoPoint()
-    var dates = [Date]() {
-        didSet {
-            dateListTable.reloadData()
-        }
-    }
 
-    var dateFormatter = DateFormatter()
-
+    @IBOutlet weak var discountedTicketsPrice: NSTextField!
+    //var eventDateTimeDict = [ Date: [Date] ]()
+    var eventDateTimeList = [(Date,Date)]()
+    var discountedSessionsList = [(Date,Date)]()
     var imageFileUrl: URL?
     var isGeoLocationFound:Bool = false
 
@@ -70,20 +69,22 @@ class ViewController: NSViewController, NSTableViewDelegate, NSTableViewDataSour
     }
 
     var textFields = [NSTextField]()
-    private var testData = [String: [String: Any]]()
-    private var imageTestData = [String: [String: Any]]()
     var data = [String: Any]()
 
     var deleteUnusedPhotos = false
 
     //To-Do: Make this an Enum later
-    let eventCategories = ["", "Storytime","Arts & Crafts","Indoor Play", "Indoor Activity", "Outdoor Activity", "Outdoor", "Mommy & Me","Museums","Nature & Science","Out & About","Parents Night Out","Shows & Concerts", "Movies", "Festivals & Fairs","Experience", "Seasonal & Holidays", "Place", "Music","Swimming","Mommy Only", "Indoor", "Other"]
+    let eventCategories = ["Categories", "Storytime","Arts & Crafts","Indoor Play", "Indoor Activity", "Outdoor Activity", "Outdoor", "Indoor", "Mommy & Me","Museums","Nature & Science","Out & About","Parents Night Out","Shows & Concerts", "Movies", "Festivals & Fairs","Experience", "Seasonal & Holidays", "Place", "Music","Swimming","Mommy Only", "Other"]
+    let eventKeywords = ["Keywords", "Events", "Indoor", "Activity"]
 
     override func viewDidLoad() {
         super.viewDidLoad()
         datePicker.dateValue = Date()
         dateListTable.delegate = self
         dateListTable.dataSource = self
+
+        discountedSessionsTable.delegate = self
+        discountedSessionsTable.dataSource = self
 
         textFields.append(eventTitle)
         textFields.append(location)
@@ -99,15 +100,261 @@ class ViewController: NSViewController, NSTableViewDelegate, NSTableViewDataSour
         cat2.addItems(withTitles: eventCategories)
 
         cat3.removeAllItems()
-        cat3.addItems(withTitles: eventCategories)
+        cat3.addItems(withTitles: eventKeywords)
 
 
         geoLocOKButton.layer?.backgroundColor = NSColor.blue.cgColor
 
-        let pickerClick = NSClickGestureRecognizer(target: self, action: #selector(ViewController.handlePickerClick))
-        pickerClick.numberOfClicksRequired = 2
-        datePicker.addGestureRecognizer(pickerClick)
+//        let pickerClick = NSClickGestureRecognizer(target: self, action: #selector(ViewController.handlePickerClick))
+//        pickerClick.numberOfClicksRequired = 1
+//        datePicker.addGestureRecognizer(pickerClick)
+//
 
+
+    }
+
+    private func validateFields() -> Bool {
+        var validationResult = true
+        //check textFields
+        for field in textFields {
+            if field.stringValue.isEmpty {
+                //exclude event price field, if event is free
+                if field == eventPriceField && freeEventCheckButton.state == 1 {
+                    field.backgroundColor = NSColor.white
+                    continue
+                }
+
+                validationResult = false
+                //field.layer?.borderColor = NSColor.red.cgColor
+                field.backgroundColor = NSColor.red
+            } else {
+                field.backgroundColor = NSColor.white
+            }
+        }
+
+        //check eventDescription
+        if eventDescription.stringValue.isEmpty {
+            eventDescription.backgroundColor = NSColor.red
+            validationResult = false
+        } else {
+            eventDescription.backgroundColor = NSColor.white
+
+        }
+
+        if categoryList.indexOfSelectedItem == 0 {
+            validationResult = false
+        }
+
+        if cat2.indexOfSelectedItem == 0 {
+            validationResult = false
+        }
+
+        if cat3.indexOfSelectedItem == 0 {
+            validationResult = false
+        }
+
+        if isGeoLocationFound == false {
+            validationResult = false
+            geoLocOKButton.layer?.backgroundColor = NSColor.red.cgColor
+        }
+
+        if discountedSessionsList.count > 0 {
+            if discountedTicketsURL.stringValue.isEmpty  || discountedTicketsPrice.stringValue.isEmpty {
+                validationResult = false
+                let alert = NSAlert.init()
+                alert.messageText = "Discounted Tickets URL and Discounted Tickets Price field should be filled"
+                alert.addButton(withTitle: "OK")
+                alert.runModal()
+            }
+        }
+
+        if eventDateTimeList.count == 0 {
+            validationResult = false
+            let alert = NSAlert.init()
+            alert.messageText = "Enter at least one event date"
+            alert.addButton(withTitle: "OK")
+            alert.runModal()
+        }
+
+        return validationResult
+    }
+
+    private func prepareData() -> Bool {
+        data = [String: Any]()
+        data["title"] = eventTitle.stringValue
+        data["allDay"] = false
+        data["free"] = freeEventCheckButton.state != 0 ? true : false
+        data["price"] = eventPriceField.stringValue
+        data["originalEventURL"] = eventURL.stringValue
+        data["location"] = location.stringValue
+        data["address"] = locationAddress.stringValue
+        data["description"] = eventDescription.stringValue
+        data["ages"] = eventAges.stringValue
+        data["imageURL"] = ""
+        data["isActive"] = eventActiveCheckButton.state != 0 ? true : false
+        data["isPopular"] = popularEventCheckButton.state != 0 ? true : false
+        data["isFeatured"] = featuredCheckButton.state != 0 ? true : false
+        data["geoLocation"] = geoLocation
+        data["category"] = eventCategories[categoryList.indexOfSelectedItem] //main catagory
+        let categories = [eventCategories[categoryList.indexOfSelectedItem], eventCategories[cat2.indexOfSelectedItem], eventKeywords[cat3.indexOfSelectedItem]]
+        data["categoryKeywords"] = categories
+        data["ticketsURL"] = ticketsURL.stringValue
+        data["discountedTicketsURL"] = discountedTicketsURL.stringValue
+        data["allEventDates"] = eventDateTimeList.flatMap { $0.0 }
+        data["discountedTicketPrice"] = discountedTicketsPrice.stringValue
+        //prepared allEventDates
+        //var eventDateList = [Date]()
+//        for dt in eventDateTimeStartList {
+//            if let date = DateUtil.shared.UTCdateValue(date: dt) {
+//                eventDateList.append(date)
+//            }
+//        }
+
+        var eventInstancesDictionary = [[String:Date]]()
+
+        for item in eventDateTimeList {
+            var dict = [String:Date]()
+            dict["startTime"] = item.0
+            dict["endTime"] = item.1
+            eventInstancesDictionary.append(dict)
+        }
+
+        data["eventInstances"] = eventInstancesDictionary
+
+        var eventDiscountedInstancesList = [[String:Date]]()
+
+        for item in discountedSessionsList {
+            var dict = [String:Date]()
+            dict["startTime"] = item.0
+            dict["endTime"] = item.1
+            eventDiscountedInstancesList.append(dict)
+        }
+
+        data["discountedTicketInstances"] = eventDiscountedInstancesList
+
+
+        if let imageFileUrl = imageFileUrl { //if this is true, it means upload new image.
+            if let imageData = try? Data(contentsOf: imageFileUrl) {
+                var fileName = imageFileUrl.deletingPathExtension().lastPathComponent
+                guard let imgObjId = uploadEventImage(data: imageData, imageName: fileName) else { print("CANT GET IMAGE OBJECT ID"); return false }
+                eventImageObjectId.stringValue = imgObjId
+            }
+        }
+
+        data["imageObjectId"] = eventImageObjectId.stringValue
+
+        return true
+    }
+
+    private func saveToParse() -> Bool {
+
+        if editingEvent {
+            //            let alleventdates = objectToBeEdited?["allEventDates"] as! [Date];
+            //            guard let _ = try? objectToBeEdited?.save() else { return false }
+            //
+            //            for date in alleventdates {
+            //                //let date = alleventdates[0]
+            //                let q = PFQuery(className: "EventDate")
+            //                q.whereKey("eventDate", equalTo: date)
+            //                if let eventDateObjects = try? q.findObjects() {
+            //                    if eventDateObjects.count == 0 {
+            //                        let dateObject: PFObject = PFObject(className: "EventDate")
+            //                        dateObject["eventDate"] = date
+            //                        let relation = dateObject.relation(forKey: "events")
+            //                        relation.add(objectToBeEdited!)
+            //                        guard let _ = try? dateObject.save() else { return false }
+            //                        //print("Date object created and event object linked to the date object")
+            //                    } else {
+            //                        let existingDateObject = eventDateObjects[0]
+            //                        let relation = existingDateObject.relation(forKey: "events")
+            //                        relation.add(objectToBeEdited!)
+            //                        guard let _ = try? existingDateObject.save() else { return false }
+            //                        //print("Event object linked to existing date object")
+            //                    }
+            //                }
+            //            }
+            return true
+        }
+
+
+        //guard data.count > 0 else { return false }
+
+        let eventObject: PFObject = PFObject(className: "Event")
+        eventObject["title"] = data["title"]
+        eventObject["allEventDates"] = data["allEventDates"] as! [Date]
+        eventObject["allDay"] = false
+        eventObject["free"] = data ["free"] as! Bool
+        eventObject["price"] =  data["price"] as! String
+        eventObject["originalEventURL"] = data["originalEventURL"] as! String
+        eventObject["location"] = data["location"] as! String
+        eventObject["address"] = data["address"] as! String
+        eventObject["description"] = data["description"] as! String
+        eventObject["ages"] = data["ages"] as! String
+        eventObject["imageURL"] = data["imageURL"] as! String
+        eventObject["isActive"] = data["isActive"] as! Bool
+        eventObject["isPopular"] = data["isPopular"] as! Bool
+        eventObject["isFeatured"] = data["isFeatured"] as! Bool
+        eventObject["imageObjectId"] = data["imageObjectId"] as! String
+        eventObject["category"] = data["category"] as! String
+        eventObject["isSpecialEvent"] = false
+        eventObject["geoLocation"] = data["geoLocation"] as! PFGeoPoint
+        eventObject["categoryKeywords"] = data["categoryKeywords"] as! [String]
+        eventObject["ticketsURL"] = data["ticketsURL"]
+        eventObject["discountedTicketInstances"] = data["discountedTicketInstances"] as? [[String:Date]]
+        eventObject["discountedTicketsURL"] = data["discountedTicketsURL"]
+        eventObject["discountedTicketPrice"] = data["discountedTicketPrice"]
+        eventObject["eventInstances"] = data["eventInstances"] as! [[String:Date]]
+
+        let alleventdates = data["allEventDates"] as! [Date] //these are start dates
+
+        for date in alleventdates {
+            //let date = alleventdates[0]
+            let eventInstance: PFObject = PFObject(className: "EventInstance")
+            eventInstance["eventDate"] = date
+            eventInstance["eventImageId"] = data["imageObjectId"] as! String
+            eventInstance["eventTitle"] = data["title"] as! String
+
+            guard let ins = try? eventInstance.save() else { return false }
+            //print("Date object created and event object linked to the date object")
+
+            eventObject.add(eventInstance, forKey: "eventInstanceObjects")
+        }
+
+
+        guard let _ = try? eventObject.save() else { return false }
+
+//        for date in alleventdates {
+//            //let date = alleventdates[0]
+//            let q = PFQuery(className: "TestEventDate")
+//            q.whereKey("eventDate", equalTo: date)
+//            if let eventDateObjects = try? q.findObjects() {
+//                if eventDateObjects.count == 0 {
+//                    let dateObject: PFObject = PFObject(className: "TestEventDate")
+//                    dateObject["eventDate"] = date
+//                    let relation = dateObject.relation(forKey: "events")
+//                    relation.add(eventObject)
+//                    guard let _ = try? dateObject.save() else { return false }
+//                    //print("Date object created and event object linked to the date object")
+//                } else {
+//                    let existingDateObject = eventDateObjects[0]
+//                    let relation = existingDateObject.relation(forKey: "events")
+//                    relation.add(eventObject)
+//                    guard let _ = try? existingDateObject.save() else { return false }
+//                    //print("Event object linked to existing date object")
+//                }
+//            }
+//        }
+        return true
+    }
+
+    @IBAction func clearDiscountedSessionsTable(_ sender: Any) {
+        discountedSessionsList = []
+        discountedSessionsTable.reloadData()
+    }
+
+    @IBAction func clearEventDatesTable(_ sender: Any) {
+        eventDateTimeList = [(Date,Date)]()
+        dateListTable.reloadData()
     }
 
     @IBAction func deletePhotosPressed(_ sender: Any) {
@@ -123,7 +370,7 @@ class ViewController: NSViewController, NSTableViewDelegate, NSTableViewDataSour
                 let query2 = PFQuery(className: "EventObject")
                 query2.whereKey("imageObjectId", equalTo: obj.objectId)
                 //print(obj.imageName, " to be deleted")
-                print(obj.objectId, " to be deleted")
+                //print(obj.objectId, " to be deleted")
                 let eventobj = try? query2.getFirstObject()
                 if eventobj != nil {
                         //there is a event with that image, continue
@@ -144,37 +391,54 @@ class ViewController: NSViewController, NSTableViewDelegate, NSTableViewDataSour
         }
     }
 
-    func handlePickerClick() {
-       // let dateWithSetComponents = DateUtil.shared.convertToUTCMidnight(from: datePicker.dateValue)
-        let dateWithSetComponents = DateUtil.shared.createUTCDate(from: datePicker.dateValue)
-        let dateToRemove = dates.filter{ $0 == dateWithSetComponents }
-
-
-        if let date = dateToRemove.first {
-            dates.remove(object: date)
-            dateListTable.reloadData()
-        } else {
-            dates.append(dateWithSetComponents!)
-        }
+    @IBAction func datePickerClicked(_ sender: NSDatePicker) {
+        handlePickerClick()
     }
 
-    //For now we can just delete a date and can't update it.
-    @IBAction func endEditingText(_ sender: NSTextField) {
-        let row = dateListTable.row(for: sender)
-        let column = dateListTable.column(for: sender)
-       // print("Row: ", row)
-        if sender.stringValue.isEmpty {
-            if dates.count > row {
-                //print("dates.count", dates.count)
-                dates.remove(at: row)
+
+    func handlePickerClick() {
+        if let startDateTime = DateUtil.shared.concetenateDateAndTime(date: datePicker.dateValue, time: eventStartTimePicker.dateValue) {
+            let endDateTime = DateUtil.shared.concetenateDateAndTime(date: datePicker.dateValue, time: eventEndTimePicker.dateValue)!
+
+            if startDateTime >= endDateTime {
+                let alert = NSAlert.init()
+                alert.messageText = "Event start time should be less than event end time"
+                alert.addButton(withTitle: "OK")
+                alert.runModal()
+
+                return
             }
+
+            if eventDateTimeList.contains(where: { $0 == (startDateTime, endDateTime) } ) {
+                return
+            }
+
+            eventDateTimeList.append((startDateTime, endDateTime))
         }
+
         dateListTable.reloadData()
     }
 
 
-    @IBAction func editEventSelected(_ sender: Any) {
+    @IBAction func endEditingText(_ sender: NSTextField) {
 
+        if dateListTable.selectedRow == -1 {
+            //it's the other table
+            let editedRowIndex = discountedSessionsTable.selectedRow
+            _ = discountedSessionsList.remove(at: editedRowIndex)
+
+            discountedSessionsTable.reloadData()
+        } else {
+
+            let editedRowIndex = dateListTable.selectedRow
+            _ = eventDateTimeList.remove(at: editedRowIndex)
+
+            dateListTable.reloadData()
+        }
+
+    }
+
+    @IBAction func editEventSelected(_ sender: Any) {
         //Pull information about 
 
         if !eventObjectIdTextfield.stringValue.isEmpty {
@@ -190,17 +454,42 @@ class ViewController: NSViewController, NSTableViewDelegate, NSTableViewDataSour
        // print("Pop-up category item chosen:", sender.indexOfSelectedItem)
     }
 
-//    func addDate(_ sender: Any) {
-//        let date = datePicker.dateValue
-//        let calendar = NSCalendar.current
-//        let components = calendar.dateComponents([.day, .year, .month], from: date)
-//        let dateWithSetComponents = calendar.date(from: components)!
-//        dates.append(dateWithSetComponents)
-//    }
+
+    @IBAction func addToDiscountedSessionsList(_ sender: NSButton) {
+        //var selectedIndexes = dateListTable.selectedRowIndexes
+        if dateListTable.selectedRow == -1 {
+            return
+        }
+
+        var discountedSession = eventDateTimeList[dateListTable.selectedRow]
+        let value = eventDateTimeList[dateListTable.selectedRow]
+
+        if discountedSessionsList.contains( where: { $0 == value } ) {
+            return
+        }
+
+        self.discountedSessionsList.append(discountedSession)
+        discountedSessionsTable.reloadData()
+
+    }
 
     @IBAction func doneButtonClicked(_ sender: Any) {
         if editingEvent {
-            objectToBeEdited?["allEventDates"] = self.dates
+//            objectToBeEdited?["allEventDates"] = Array(self.eventDateTimeDict.keys)
+//
+//            var count = 0
+//            for (key,value) in eventDateTimeDict {
+//                count = count + value.count
+//            }
+//
+//            if count != dates.count {
+//                dateListTable.backgroundColor = NSColor.red
+//                let alert = NSAlert.init()
+//                alert.messageText = "EDIT EVENT: Dates mismatch!!!"
+//                alert.addButton(withTitle: "OK")
+//                alert.runModal()
+//                return
+//            }
 
 //            if self.location.stringValue != objectToBeEdited!["location"] as! String {
 //                objectToBeEdited!["location"] = location.stringValue
@@ -211,17 +500,15 @@ class ViewController: NSViewController, NSTableViewDelegate, NSTableViewDataSour
 //            objectToBeEdited?["startTime"] = eventStartTimePicker.isEnabled ? dateFormatter.string(from: eventStartTimePicker.dateValue) : ""
 //            objectToBeEdited?["endTime"] = eventEndTimePicker.isEnabled ? dateFormatter.string(from: eventEndTimePicker.dateValue) : ""
 
-            guard saveToParse() else { return }
-            self.performSegue(withIdentifier: "alertView", sender: nil)
+ //           guard saveToParse() else { return }
+ //           self.performSegue(withIdentifier: "alertView", sender: nil)
         } else {
             guard validateFields() else { return }
             guard prepareData() else { return }
             guard saveToParse() else { return }
             //if everything above is true then show success pop-up
             performSegue(withIdentifier: "alertView", sender: nil)
-
         }
-
     }
 
     private func parseEventInfoForScreen() {
@@ -260,19 +547,6 @@ class ViewController: NSViewController, NSTableViewDelegate, NSTableViewDataSour
 
     }
 
-    private func specialEventEntry() {
-
-        let SpecialEventReq: PFObject = PFObject(className: "SeasonalEvents")
-        SpecialEventReq["isEnabled"] = true
-        SpecialEventReq["name"] = ""
-
-        //event object has all the date it needs. Save it now. In the completion handler
-        //we can check which dates it needs to have relation with.
-        guard let _ = try? SpecialEventReq.save() else { return  }
-        //print("Event object saved")
-
-    }
-
     private func setImageCacheLimit() {
         let cacheObject: PFObject = PFObject(className: "ImageCache")
         cacheObject["limit"] = 50
@@ -280,138 +554,6 @@ class ViewController: NSViewController, NSTableViewDelegate, NSTableViewDataSour
         guard let _ = try? cacheObject.save() else { return }
     }
 
-    private func saveToParse() -> Bool {
-
-        if editingEvent {
-            let alleventdates = objectToBeEdited?["allEventDates"] as! [Date];
-
-            guard let _ = try? objectToBeEdited?.save() else { return false }
-
-            for date in alleventdates {
-                //let date = alleventdates[0]
-                let q = PFQuery(className: "EventDate")
-                q.whereKey("eventDate", equalTo: date)
-                if let eventDateObjects = try? q.findObjects() {
-                    if eventDateObjects.count == 0 {
-                        let dateObject: PFObject = PFObject(className: "EventDate")
-                        dateObject["eventDate"] = date
-                        let relation = dateObject.relation(forKey: "events")
-                        relation.add(objectToBeEdited!)
-                        guard let _ = try? dateObject.save() else { return false }
-                        //print("Date object created and event object linked to the date object")
-                    } else {
-                        let existingDateObject = eventDateObjects[0]
-                        let relation = existingDateObject.relation(forKey: "events")
-                        relation.add(objectToBeEdited!)
-                        guard let _ = try? existingDateObject.save() else { return false }
-                        //print("Event object linked to existing date object")
-                    }
-                }
-            }
-            return true
-        }
-
-
-        guard data.count > 0 else { return false }
-
-        let eventObject: PFObject = PFObject(className: "EventObject")
-        eventObject["title"] = data["title"]
-        eventObject["allEventDates"] = data["allEventDates"] as! [Date];
-        eventObject["startDate"] = data["startDate"] as! Date
-        eventObject["endDate"] = data["endDate"] as! Date
-        eventObject["allDay"] = false
-        eventObject["startTime"] = data["startTime"] as? String
-        eventObject["endTime"] = data["endTime"] as? String
-        eventObject["free"] = data ["free"] as! Bool
-        eventObject["price"] =  data["price"] as! String
-        eventObject["originalEventURL"] = data["originalEventURL"] as! String
-        eventObject["location"] = data["location"] as! String
-        eventObject["locationHours"] = " "
-        eventObject["address"] = data["address"] as! String
-        eventObject["description"] = data["description"] as! String
-        eventObject["ages"] = data["ages"] as! String
-        eventObject["imageURL"] = data["imageURL"] as! String
-        eventObject["isActive"] = data["isActive"] as! Bool
-        eventObject["isPopular"] = data["isPopular"] as! Bool
-        eventObject["isFeatured"] = data["isFeatured"] as! Bool
-        eventObject["imageObjectId"] = data["imageObjectId"] as! String
-        eventObject["category"] = data["category"] as! String
-        eventObject["isSpecialEvent"] = false
-        eventObject["geoLocation"] = data["geoLocation"] as! PFGeoPoint
-        eventObject["categoryKeywords"] = data["categoryKeywords"] as! [String]
-
-        let alleventdates = data["allEventDates"] as! [Date];
-
-        //event object has all the date it needs. Save it now. In the completion handler
-        //we can check which dates it needs to have relation with.
-        guard let _ = try? eventObject.save() else { return false }
-        //print("Event object saved")
-
-        for date in alleventdates {
-            //let date = alleventdates[0]
-            let q = PFQuery(className: "EventDate")
-            q.whereKey("eventDate", equalTo: date)
-            if let eventDateObjects = try? q.findObjects() {
-                if eventDateObjects.count == 0 {
-                    let dateObject: PFObject = PFObject(className: "EventDate")
-                    dateObject["eventDate"] = date
-                    let relation = dateObject.relation(forKey: "events")
-                    relation.add(eventObject)
-                    guard let _ = try? dateObject.save() else { return false }
-                    //print("Date object created and event object linked to the date object")
-                } else {
-                    let existingDateObject = eventDateObjects[0]
-                    let relation = existingDateObject.relation(forKey: "events")
-                    relation.add(eventObject)
-                    guard let _ = try? existingDateObject.save() else { return false }
-                    //print("Event object linked to existing date object")
-                }
-            }
-        }
-        return true
-    }
-
-
-    private func prepareData() -> Bool {
-        data = [String: Any]()
-        data["title"] = eventTitle.stringValue
-        data["allEventDates"] = self.dates
-        data["startDate"] = Date()
-        data["endDate"] = Date()
-        data["allDay"] = false
-        self.dateFormatter.dateFormat = "h:mm a"
-        data["startTime"] = eventStartTimePicker.isEnabled ? dateFormatter.string(from: eventStartTimePicker.dateValue) : ""
-        data["endTime"] = eventEndTimePicker.isEnabled ? dateFormatter.string(from: eventEndTimePicker.dateValue) : ""
-        data["free"] = freeEventCheckButton.state != 0 ? true : false
-        data["price"] = eventPriceField.stringValue
-        data["originalEventURL"] = eventURL.stringValue
-        data["location"] = location.stringValue
-        data["locationHours"] = " "
-        data["address"] = locationAddress.stringValue
-        data["description"] = eventDescription.stringValue
-        data["ages"] = eventAges.stringValue
-        data["imageURL"] = ""
-        data["isActive"] = eventActiveCheckButton.state != 0 ? true : false
-        data["isPopular"] = popularEventCheckButton.state != 0 ? true : false
-        data["category"] = eventCategories[categoryList.indexOfSelectedItem]
-        data["isFeatured"] = featuredCheckButton.state != 0 ? true : false
-        data["geoLocation"] = geoLocation
-        //var catKeywords = ["Indoor", "Shows & Concerts"]
-        let categories = [eventCategories[categoryList.indexOfSelectedItem], eventCategories[cat2.indexOfSelectedItem], eventCategories[cat3.indexOfSelectedItem]]
-        data["categoryKeywords"] = categories
-
-        if let imageFileUrl = imageFileUrl { //if this is true, it means upload new image.
-            if let imageData = try? Data(contentsOf: imageFileUrl) {
-                var fileName = imageFileUrl.deletingPathExtension().lastPathComponent
-                guard let imgObjId = uploadEventImage(data: imageData, imageName: fileName) else { print("CANT GET IMAGE OBJECT ID"); return false }
-                eventImageObjectId.stringValue = imgObjId
-            }
-        }
-
-        data["imageObjectId"] = eventImageObjectId.stringValue
-
-        return true
-    }
 
 
     @IBAction func freeEventPicked(_ sender: NSButton) {
@@ -427,55 +569,8 @@ class ViewController: NSViewController, NSTableViewDelegate, NSTableViewDataSour
         //}
     }
 
-    private func validateFields() -> Bool {
-        var validationResult = true
-        //check textFields
-        for field in textFields {
-            if field.stringValue.isEmpty {
-                //exclude event price field, if event is free
-                if field == eventPriceField && freeEventCheckButton.state == 1 {
-                    field.backgroundColor = NSColor.white
-                    continue
-                }
-
-                validationResult = false
-                //field.layer?.borderColor = NSColor.red.cgColor
-                field.backgroundColor = NSColor.red
-            } else {
-                field.backgroundColor = NSColor.white
-            }
-        }
-
-        //check eventDescription
-        if eventDescription.stringValue.isEmpty {
-            eventDescription.backgroundColor = NSColor.red
-            validationResult = false
-        } else {
-            eventDescription.backgroundColor = NSColor.white
-
-        }
-
-        //check if table has at least one entry
-        if dates.count == 0 {
-            dateListTable.backgroundColor = NSColor.red
-            validationResult = false
-        } else {
-            dateListTable.backgroundColor = NSColor.white
-        }
-
-        //for now category field can be empty
-        if categoryList.indexOfSelectedItem == 0 {
-             validationResult = false
-        }
-
-        if isGeoLocationFound == false {
-            validationResult = false
-            geoLocOKButton.layer?.backgroundColor = NSColor.red.cgColor
-        }
 
 
-        return validationResult
-    }
 
     @IBAction func addressReverseLookUp(_ sender: Any) {
         let geocoder = CLGeocoder()
@@ -568,19 +663,28 @@ class ViewController: NSViewController, NSTableViewDelegate, NSTableViewDataSour
 
 
     func numberOfRows(in tableView: NSTableView) -> Int {
-        return self.dates.count
+        if tableView == discountedSessionsTable {
+            return discountedSessionsList.count
+        } else {
+            return eventDateTimeList.count //Array(self.eventDateTimeDict.values.flatMap { $0 }).count
+        }
     }
+
 
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
         if let cell = dateListTable.make(withIdentifier: "dateCell", owner: nil) as? NSTableCellView {
-            self.dateFormatter.dateFormat = "MM-dd-YYYY"
-            //print(dates[row])
-            cell.textField?.stringValue =  self.dateFormatter.string(from: dates[row])
+            let item = eventDateTimeList[row]
+            let dateString = DateUtil.shared.formattedTimeValue(time: item.0) + " - " + DateUtil.shared.shortFormattedTimeValue(time: item.1)
+            cell.textField?.stringValue = dateString
+            return cell
+        } else if let cell = dateListTable.make(withIdentifier: "discountedSessionsCell", owner: nil) as? NSTableCellView {
+            let item = discountedSessionsList[row]
+            let dateString = DateUtil.shared.formattedTimeValue(time: item.0) + " - " + DateUtil.shared.shortFormattedTimeValue(time: item.1)
+            cell.textField?.stringValue = dateString
             return cell
         }
         return nil
     }
-
 
     func bulkUpdateEventDateTimes() {
         let allEventDateObjectsQuery = PFQuery(className: "EventDate")
@@ -588,8 +692,8 @@ class ViewController: NSViewController, NSTableViewDelegate, NSTableViewDataSour
         if let objects = try? allEventDateObjectsQuery.findObjects() {
                 for object in objects {
                     print("old date", object["eventDate"])
-                    print("new date", DateUtil.shared.convertToUTCMidnight(from: object["eventDate"] as! Date))
-                    object["eventDate"] = DateUtil.shared.convertToUTCMidnight(from: object["eventDate"] as! Date)
+                    //print("new date", DateUtil.shared.convertToUTCMidnight(from: object["eventDate"] as! Date))
+                    //object["eventDate"] = DateUtil.shared.convertToUTCMidnight(from: object["eventDate"] as! Date)
                     object.saveInBackground()
                 }
         }
@@ -601,33 +705,12 @@ class ViewController: NSViewController, NSTableViewDelegate, NSTableViewDataSour
         if let dateObjects = try? allEventDateObjectsQuery.findObjects() {
             for dateObject in dateObjects {
                 print("old date", dateObject["eventDate"])
-                print("new date", DateUtil.shared.convertToUTCMidnight(from: dateObject["eventDate"] as! Date))
+                //print("new date", DateUtil.shared.convertToUTCMidnight(from: dateObject["eventDate"] as! Date))
                 //object["eventDate"] = DateUtil.shared.convertToUTCMidnight(from: dateObject["eventDate"] as! Date))
                 //object.saveInBackground()
             }
         }
     }
-
-//    func bulkUpdateEventDateList() {
-//        let allEventDateObjectsQuery = PFQuery(className: "EventObject")
-//        allEventDateObjectsQuery.limit = 100
-//        if let objects = try? allEventDateObjectsQuery.findObjects() {
-//            for object in objects {
-//                print("old date", object["eventDate"])
-//                print("new date", DateUtil.shared.convertToUTCMidnight(from: object["eventDate"] as! Date))
-//
-//                var dates = object["allEventDates"] as! [Date]
-//                var newDates = [Date]()
-//                for date in dates {
-//                    if let newDate: Date = DateUtil.shared.convertToUTCMidnight(from:date) {
-//                        newDates.append(newDate)
-//                    }
-//                }
-//                object["allEventDates"] = newDates
-//                object.saveInBackground()
-//            }
-//        }
-//    }
 }
 
 extension Array where Element: Equatable {

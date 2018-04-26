@@ -16,44 +16,48 @@ class DateUtil {
     private init() {
         formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US")
-        formatter.timeZone = TimeZone(abbreviation: "UTC")
     }
 
-    func convertToUTCMidnight(from date: Date) -> Date? {
-        var dateComponents = Calendar.current.dateComponents([.year, .month, .day], from: date)
-        dateComponents.timeZone = TimeZone(abbreviation: "UTC")
 
-        return Calendar.current.date(from: dateComponents)
-
+    //below I'm creating an absoulte value here. This is donw with Datecomponents. If there was no UTC set as timezone, Calendar assumes PST(system time zone) and converts dateComp(which is created in UTC) to PST. This is a correct behaviour however I want to manupulate the hour value, so I'm forcing it to create an UTC date with set hour.
+    func formattedDateValueWithHourZeroZero(date: Date) -> Date? {
+        var dateComp = Calendar.current.dateComponents([.year, .month, .day], from: date)
+        dateComp.timeZone = TimeZone(abbreviation: "UTC") // makes it fixed so UTC conversion doesn't happen.
+        return Calendar.current.date(from:dateComp)
     }
 
-    func createUTCDate(from date: Date) -> Date? {
-        var dateComponents = Calendar.current.dateComponents([.year, .month, .day, .hour], from: date)
-        dateComponents.hour = 08
-        dateComponents.timeZone = TimeZone(abbreviation: "UTC")
-
-        return Calendar.current.date(from:dateComponents)
+    func UTCdateValue(date: Date) -> Date? {
+        var components = Calendar.current.dateComponents([.day , .month, .year, .hour, .minute, .second], from: date)
+        components.hour = 0
+        components.minute = 0
+        components.second = 0
+        components.timeZone = TimeZone(abbreviation: "UTC")
+        return Calendar.current.date(from: components)
     }
 
-    func concetenateDateAndTime(date: Date, time:String ) -> Date {
+    func formattedTimeValue(time: Date) -> String {
+        formatter.dateStyle = .short
+        formatter.timeStyle = .short
+        return formatter.string(from:time)
+    }
+
+    func shortFormattedTimeValue(time: Date) -> String {
         formatter.dateFormat = "h:mm a"
-        let timeObj = formatter.date(from:time)
-        var timeComponents = Calendar.current.dateComponents([.hour, .minute, ], from: timeObj!)
-        timeComponents.timeZone = TimeZone(abbreviation: "UTC")
+        return formatter.string(from:time)
+    }
 
-        var dateComponents = Calendar.current.dateComponents([.year, .month, .day], from: date)
-        dateComponents.timeZone = TimeZone(abbreviation: "UTC")
+    func concetenateDateAndTime(date: Date, time:Date ) -> Date? {
 
+        var timeComponents = Calendar.current.dateComponents([.hour, .minute, .second ], from: time)
+        var dateComponents =  Calendar.current.dateComponents([.year, .month, .day], from: date)
         dateComponents.hour = timeComponents.hour
         dateComponents.minute = timeComponents.minute
+        dateComponents.second = timeComponents.second
+        print(dateComponents.timeZone)
+        print(timeComponents.timeZone)
+        print( Calendar.current.date(from: dateComponents))
 
-      //  guard let laterDate = Calendar.current.date(byAdding: dateComponents, to: createDate(from:today())) else { return nil }
-
-        return Calendar.current.date(from: dateComponents)!
-
+        return Calendar.current.date(from: dateComponents)
     }
-
-
-
 
 }
